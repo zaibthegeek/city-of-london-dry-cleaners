@@ -83,12 +83,12 @@ function header(current) {
   return `
   <div class="utility">
     <div class="container utility__in">
-      <ul class="utility__list">
+      <ul class="utility__list utility__list--phones">
         ${locations
           .map((l) => `<li>${ic.phone}<span>${l.name}</span> <a href="tel:${l.phoneHref}">${l.phone}</a></li>`)
           .join('\n        ')}
       </ul>
-      <ul class="utility__list">
+      <ul class="utility__list utility__list--email">
         <li>${ic.mail}<a href="mailto:${site.email}">${site.email}</a></li>
       </ul>
     </div>
@@ -128,6 +128,8 @@ function header(current) {
       ${services.map((s) => `<a class="sub" href="/${s.slug}">${s.navTitle}</a>`).join('\n      ')}
       <a href="/price-list">Price List</a>
       <a href="/contact-us">Contact</a>
+      <a class="mnav__mail" href="mailto:${site.email}">${site.email}</a>
+      <div class="mnav__cta"><a class="btn btn--block" href="/contact-us">Request a quote</a></div>
     </nav>
   </header>`;
 }

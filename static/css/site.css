@@ -110,7 +110,15 @@ h1 { font-size: 34px; } h2 { font-size: 26px; } h3 { font-size: 19px; } h4 { fon
 .utility__list { display: flex; flex-wrap: wrap; gap: 8px 22px; }
 .utility__list li { display: flex; align-items: center; gap: 7px; }
 .utility svg { width: 13px; height: 13px; stroke: var(--cyan); flex: none; }
-@media (max-width: 767px) { .utility__in { justify-content: center; text-align: center; padding-block: 8px; } }
+@media (max-width: 767px) {
+  /* two tidy centred columns instead of three ragged wrapped lines */
+  .utility__in { display: block; padding-block: 9px; min-height: 0; }
+  .utility__list--phones { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 12px; }
+  .utility__list--phones li { flex-wrap: wrap; justify-content: center; text-align: center; gap: 1px 6px; }
+  .utility__list--phones li a { flex: 0 0 100%; font-weight: 600; font-size: 13.5px; padding-block: 2px; }
+  /* email moves into the menu on small screens, where tapping to call matters more */
+  .utility__list--email { display: none; }
+}
 
 /* ---------- header ---------- */
 .header { background: #fff; border-bottom: 1px solid var(--line); position: sticky; top: 0; z-index: 100; box-shadow: 0 1px 4px rgba(38,51,63,.07); }
@@ -326,3 +334,7 @@ h1 { font-size: 34px; } h2 { font-size: 26px; } h3 { font-size: 19px; } h4 { fon
   .col-6 + .col-6 { margin-top: 40px; }
   .col-8 + .sidebar { margin-top: 40px; }
 }
+
+/* mobile menu extras: email and the primary CTA, both hidden in the bar above */
+.mnav__mail { text-transform: none !important; letter-spacing: 0 !important; font-family: var(--body-font) !important; font-weight: 400 !important; font-size: 14px !important; color: var(--blue) !important; }
+.mnav__cta { padding: 14px 15px 18px; }
