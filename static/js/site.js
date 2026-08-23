@@ -11,13 +11,53 @@
     burger.addEventListener('click', function () {
       var open = mnav.classList.toggle('is-open');
       burger.setAttribute('aria-expanded', String(open));
+      document.body.classList.toggle('menu-open', open);
     });
     mnav.addEventListener('click', function (e) {
       if (e.target.tagName === 'A') {
         mnav.classList.remove('is-open');
         burger.setAttribute('aria-expanded', 'false');
+        document.body.classList.remove('menu-open');
       }
     });
+  }
+
+  /* ---------------- sticky call bar ----------------
+     Visible only between the hero and the footer, so it never competes with
+     the hero buttons and never sits on top of the footer's own numbers. */
+  var callbar = document.getElementById('callbar');
+  if (callbar) {
+    var hero = document.querySelector('.slider') || document.querySelector('.banner');
+    var foot = document.querySelector('.footer');
+    var pastHero = !hero;
+    var atFooter = false;
+
+    var sync = function () {
+      callbar.classList.toggle('is-visible', pastHero && !atFooter);
+    };
+
+    if ('IntersectionObserver' in window) {
+      if (hero) {
+        new IntersectionObserver(function (entries) {
+          pastHero = !entries[0].isIntersecting;
+          sync();
+        }, { threshold: 0 }).observe(hero);
+      }
+      if (foot) {
+        new IntersectionObserver(function (entries) {
+          atFooter = entries[0].isIntersecting;
+          sync();
+        }, { threshold: 0 }).observe(foot);
+      }
+    } else {
+      window.addEventListener('scroll', function () {
+        pastHero = window.scrollY > (hero ? hero.offsetHeight : 400);
+        var d = document.documentElement;
+        atFooter = window.innerHeight + window.scrollY >= d.scrollHeight - (foot ? foot.offsetHeight : 0);
+        sync();
+      }, { passive: true });
+    }
+    sync();
   }
 
   /* ---------------- slider ---------------- */

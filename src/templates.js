@@ -212,6 +212,22 @@ function footer() {
   </footer>`;
 }
 
+function callBar() {
+  return `
+  <div class="callbar" id="callbar">
+    <div class="callbar__grid">
+      ${locations
+        .map(
+          (l) => `<a class="callbar__item" href="tel:${l.phoneHref}" aria-label="Call our ${l.name} shop on ${l.phone}">
+        <span class="callbar__icon" aria-hidden="true">${ic.phone}</span>
+        <span class="callbar__txt"><strong>${l.name}</strong><small>${l.postcode}</small></span>
+      </a>`
+        )
+        .join('\n      ')}
+    </div>
+  </div>`;
+}
+
 /* ---------------- structured data ---------------- */
 
 function jsonLd(path) {
@@ -289,6 +305,7 @@ ${header(path === '/' ? 'home' : path.replace(/^\//, ''))}
 ${body}
 </main>
 ${footer()}
+${callBar()}
 <script src="/js/site.js" defer></script>
 </body>
 </html>
@@ -296,7 +313,7 @@ ${footer()}
 }
 
 module.exports = {
-  layout, header, footer, banner, ctaStrip,
+  layout, header, footer, banner, ctaStrip, callBar,
   serviceCard, priceTable, locationInfo, mapEmbed, money, ic, featIcons,
   site, headOffice, locations, services, priceGroups, credentials, steps, corporate,
 };
