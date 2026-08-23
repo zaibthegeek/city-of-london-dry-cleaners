@@ -1,0 +1,11 @@
+{
+  "name": "city-of-london-dry-cleaners",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Website for City of London Dry Cleaners - Canary Wharf and London Bridge",
+  "scripts": {
+    "build": "node build.js",
+    "dev": "node build.js && npx --yes serve dist -l 4321"
+  },
+  "engines": { "node": ">=18" }
+}
