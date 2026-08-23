@@ -54,7 +54,7 @@ const services = [
     title: 'Dry Cleaning',
     navTitle: 'Dry Cleaning',
     lede: 'Suits, dresses and tailoring cleaned in perchloroethylene, hydrocarbon or aqueous, whichever the cloth calls for.',
-    card: 'Everyday tailoring through to household pieces, cleaned by people who have handled the same cloths for thirty years.',
+    card: 'Whatever the cleaning requirement, we have the experienced personnel and the up-to-the-minute technology.',
     image: 'dry-cleaning',
     alt: 'Cleaned garments hanging in protective covers on the rail',
     body: [
@@ -75,7 +75,7 @@ const services = [
     title: 'Shirt Service',
     navTitle: 'Shirt Service',
     lede: 'Collars and cuffs pre-treated, stains spotted by hand, your choice of starch, every shirt hand finished.',
-    card: 'Business shirts returned pressed, packaged and protected, hung or folded exactly as you prefer.',
+    card: 'Your shirts, be they for business or special social occasions, deserve the very best.',
     image: 'shirt-service',
     alt: 'A freshly pressed blue shirt being finished by hand',
     body: [
@@ -96,7 +96,7 @@ const services = [
     title: 'Laundry',
     navTitle: 'Laundry',
     lede: 'Bed linen and table linen cleaned to standard, precisely folded and protectively packaged.',
-    card: 'Sheets, pillowcases, duvets, tablecloths and napkins, returned crisp and correctly folded.',
+    card: 'Every item of household linen cleaned to the highest standard, then precisely folded and protectively packaged.',
     image: 'laundry',
     alt: 'Commercial laundry drum at the Canary Wharf plant',
     body: [
@@ -116,7 +116,7 @@ const services = [
     title: 'Curtains & Upholstery',
     navTitle: 'Curtains / Upholstery',
     lede: 'Lifting the accumulated dust of everyday wear to bring colour and texture back to a room.',
-    card: 'Curtain and upholstery cleaning for all fabric types, restoring colour and extending the life of the cloth.',
+    card: 'An effective way to refresh colour and texture affected by the accumulated dust and dirt of everyday wear.',
     image: 'curtains',
     alt: 'Curtains drawn back from a bright window',
     body: [
@@ -136,7 +136,7 @@ const services = [
     title: 'Suede & Leather',
     navTitle: 'Suede & Leather Cleaning',
     lede: 'Natural oils, suppleness and nap restored as near to original condition as the hide allows.',
-    card: 'Suede and leather handled by technicians who understand what cleaning takes out, and how to put it back.',
+    card: 'Our technicians take careful measures to retain the original state of your suede and leather during cleaning.',
     image: 'suede-leather',
     alt: 'Detail of a leather jacket after cleaning and re-oiling',
     body: [
@@ -156,7 +156,7 @@ const services = [
     title: 'Specialist Cleaning',
     navTitle: 'Specialist Cleaning',
     lede: 'Wedding dresses, designer suits and gowns, given the attention and the solvent they actually need.',
-    card: 'The complete range of textile care solvents, matched to the garment rather than the other way round.',
+    card: 'Whether it is a wedding dress, a designer suit or a gown, we can give it the special attention it deserves.',
     image: 'specialist',
     alt: 'A wedding dress being laced and inspected by hand',
     body: [
@@ -176,7 +176,7 @@ const services = [
     title: 'Tailoring, Repairs & Alterations',
     navTitle: 'Tailoring, Repairs & Alterations',
     lede: 'A tailor and seamstress on site at Canary Wharf, for everything from a hem to a designer adjustment.',
-    card: 'Shortening, letting out, invisible mending and zips, done in house rather than sent away.',
+    card: 'We have a tailor and seamstress on site in our Canary Wharf location.',
     image: 'tailoring',
     alt: 'Shirts and thread at the on-site tailoring bench',
     body: [

@@ -3,78 +3,94 @@
 const { site, headOffice, locations, services, priceGroups, credentials, process: steps, corporate } = require('./data');
 
 const year = new Date().getFullYear();
-
-/* ---------------- helpers ---------------- */
-
 const money = (n) => '£' + n.toFixed(2);
 
-function priceRow([name, value, isFrom]) {
+/* ---------------- icons (inline, no icon font) ---------------- */
+const ic = {
+  phone: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 01-2.2 2 19.8 19.8 0 01-8.6-3.1 19.5 19.5 0 01-6-6A19.8 19.8 0 012.1 4.2 2 2 0 014.1 2h3a2 2 0 012 1.7c.1 1 .4 1.9.7 2.8a2 2 0 01-.5 2.1L8.1 9.9a16 16 0 006 6l1.3-1.2a2 2 0 012.1-.5c.9.3 1.8.6 2.8.7a2 2 0 011.7 2z"/></svg>',
+  pin: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 6-9 13-9 13s-9-7-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>',
+  mail: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 6l-10 7L2 6"/></svg>',
+  clock: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg>',
+  scissors: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M20 4L8.1 15.9M14.5 14.5L20 20M8.1 8.1L12 12"/></svg>',
+  drop: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.7s6 6.7 6 10.4a6 6 0 11-12 0C6 9.4 12 2.7 12 2.7z"/></svg>',
+  hanger: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8V7a2.5 2.5 0 112.5 2.5"/><path d="M12 8l9.2 6.4a1.6 1.6 0 01-.9 2.9H3.7a1.6 1.6 0 01-.9-2.9L12 8z"/></svg>',
+  chevL: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>',
+  chevR: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>',
+};
+const featIcons = [ic.clock, ic.pin, ic.scissors, ic.drop];
+
+/* ---------------- components ---------------- */
+
+function serviceCard(svc) {
   return `
-          <li class="prow">
-            <span class="prow__name">${name}</span>
-            <span class="prow__dots" aria-hidden="true"></span>
-            <span class="prow__price">${isFrom ? '<span class="prow__from">from</span>' : ''}${money(value)}</span>
-          </li>`;
+          <div class="col svc-col">
+            <article class="card">
+              <a class="card__media" href="/${svc.slug}" tabindex="-1" aria-hidden="true">
+                <img src="/img/${svc.image}.webp" alt="" width="1200" height="800" loading="lazy" decoding="async">
+              </a>
+              <div class="card__body">
+                <h3><a href="/${svc.slug}">${svc.title}</a></h3>
+                <span class="card__rule"></span>
+                <p>${svc.card}</p>
+                <div><a class="btn btn--outline btn--sm" href="/${svc.slug}">Read more</a></div>
+              </div>
+            </article>
+          </div>`;
 }
 
 function priceTable(group) {
   return `
-      <section class="ptable" id="${group.id}">
-        <header class="ptable__head">
-          <h3 class="ptable__title">${group.title}</h3>
-        </header>
-        <p class="ptable__note">${group.note}</p>
-        <ul>${group.items.map(priceRow).join('')}
-        </ul>
-      </section>`;
+        <div class="table-wrap">
+          <table class="ptable">
+            <caption>${group.note}</caption>
+            <thead>
+              <tr><th scope="col">${group.title}</th><th scope="col">Price</th></tr>
+            </thead>
+            <tbody>
+              ${group.items
+                .map(
+                  ([name, value, isFrom]) =>
+                    `<tr><td>${name}</td><td><span class="amt">${
+                      isFrom ? '<span class="from">from</span>' : ''
+                    }${money(value)}</span></td></tr>`
+                )
+                .join('\n              ')}
+            </tbody>
+          </table>
+        </div>`;
 }
 
-function serviceCard(svc, i, arr) {
-  const total = Array.isArray(arr) ? arr.length : 0;
-  const wide = total > 3 && i === total - 1 && total % 3 === 1;
+function locationInfo(loc) {
   return `
-        <a class="svc reveal${wide ? ' svc--wide' : ''}" data-delay="${(i % 3) * 90}" href="/${svc.slug}">
-          <div class="svc__media">
-            <img src="/img/${svc.image}.webp" alt="${svc.alt}" width="1200" height="800" loading="lazy" decoding="async">
-            <span class="svc__n">${String(i + 1).padStart(2, '0')}</span>
-          </div>
-          <div class="svc__body">
-            <h3 class="svc__title">${svc.title}</h3>
-            <p class="svc__text">${svc.card}</p>
-            <span class="svc__more">Read more</span>
-          </div>
-        </a>`;
+            <ul class="info">
+              <li>${ic.pin}<div><strong>Address</strong><address>${loc.lines.join(', ')}</address></div></li>
+              <li>${ic.phone}<div><strong>Telephone</strong><a href="tel:${loc.phoneHref}">${loc.phone}</a></div></li>
+              <li>${ic.hanger}<div><strong>At this branch</strong>${loc.note}</div></li>
+            </ul>
+            <div class="mt-2"><a class="btn btn--outline btn--sm" href="${loc.maps}" target="_blank" rel="noopener">Get directions</a></div>`;
 }
 
-function locationCard(loc, i) {
-  return `
-        <article class="loc reveal" data-delay="${i * 100}">
-          <h3 class="loc__name">${loc.name}</h3>
-          <address class="loc__addr">${loc.lines.join('<br>')}</address>
-          <span class="loc__note">${loc.note}</span>
-          <a class="loc__tel" href="tel:${loc.phoneHref}">${loc.phone}</a>
-          <div class="loc__links">
-            <a class="tlink" href="${loc.maps}" target="_blank" rel="noopener">Get directions</a>
-          </div>
-        </article>`;
+function mapEmbed(loc) {
+  /* postcode first so Google centres on the shop rather than the district */
+  const q = encodeURIComponent(loc.postcode + ', ' + loc.lines.join(', ') + ', London, UK');
+  return `<div class="map-wrap"><iframe class="map" src="https://maps.google.com/maps?q=${q}&z=16&output=embed" title="Map showing ${site.name}, ${loc.name}" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe></div>`;
 }
 
 /* ---------------- chrome ---------------- */
 
 function header(current) {
   const isSvc = services.some((s) => s.slug === current);
-  const link = (href, label, key) =>
-    `<a class="nav__link" href="${href}"${current === key ? ' aria-current="page"' : ''}>${label}</a>`;
-
   return `
-  <div class="topbar">
-    <div class="container topbar__in">
-      <span class="topbar__note">Two counters in the City, serving Canary Wharf and London Bridge since ${site.founded}</span>
-      <div class="topbar__set">
+  <div class="utility">
+    <div class="container utility__in">
+      <ul class="utility__list">
         ${locations
-          .map((l) => `<a href="tel:${l.phoneHref}">${l.name} <span aria-hidden="true">/</span> ${l.phone}</a>`)
-          .join('')}
-      </div>
+          .map((l) => `<li>${ic.phone}<span>${l.name}</span> <a href="tel:${l.phoneHref}">${l.phone}</a></li>`)
+          .join('\n        ')}
+      </ul>
+      <ul class="utility__list">
+        <li>${ic.mail}<a href="mailto:${site.email}">${site.email}</a></li>
+      </ul>
     </div>
   </div>
 
@@ -84,63 +100,61 @@ function header(current) {
         <img src="/img/logo-navy.png" alt="${site.name}" width="1000" height="229" fetchpriority="high">
       </a>
 
-      <nav class="nav" aria-label="Primary">
-        ${link('/', 'Home', 'home')}
-        <div class="nav__item nav__item--has">
-          <a class="nav__link" href="/dry-cleaning"${isSvc ? ' aria-current="page"' : ''}>Services</a>
-          <div class="submenu">
-            ${services
-              .map(
-                (s) =>
-                  `<a href="/${s.slug}"${current === s.slug ? ' aria-current="page"' : ''}>${s.navTitle}</a>`
-              )
-              .join('')}
-          </div>
-        </div>
-        ${link('/price-list', 'Price List', 'price-list')}
-        ${link('/contact-us', 'Contact', 'contact-us')}
+      <nav aria-label="Primary">
+        <ul class="nav">
+          <li><a href="/"${current === 'home' ? ' aria-current="page"' : ''}>Home</a></li>
+          <li class="${isSvc ? 'on' : ''}">
+            <a href="/dry-cleaning" aria-haspopup="true">Services <span class="caret" aria-hidden="true"></span></a>
+            <div class="dropdown">
+              ${services
+                .map((s) => `<a href="/${s.slug}"${current === s.slug ? ' aria-current="page"' : ''}>${s.navTitle}</a>`)
+                .join('\n              ')}
+            </div>
+          </li>
+          <li><a href="/price-list"${current === 'price-list' ? ' aria-current="page"' : ''}>Price List</a></li>
+          <li><a href="/contact-us"${current === 'contact-us' ? ' aria-current="page"' : ''}>Contact</a></li>
+        </ul>
       </nav>
 
-      <div class="header__cta">
-        <a class="btn" href="/contact-us">Get in touch</a>
-      </div>
+      <div class="header__btn"><a class="btn" href="/contact-us">Request a quote</a></div>
 
-      <button class="burger" type="button" aria-expanded="false" aria-controls="drawer" aria-label="Open menu">
+      <button class="burger" type="button" aria-expanded="false" aria-controls="mnav" aria-label="Toggle menu">
         <span></span><span></span><span></span>
       </button>
     </div>
-  </header>
 
-  <div class="drawer" id="drawer" role="dialog" aria-modal="true" aria-label="Menu">
-    <div class="drawer__top">
-      <img src="/img/logo-white.png" alt="${site.name}" width="1000" height="229">
-      <button class="drawer__close" type="button" aria-label="Close menu">&times;</button>
-    </div>
-    <nav aria-label="Mobile">
+    <nav class="mnav" id="mnav" aria-label="Mobile">
       <a href="/">Home</a>
       ${services.map((s) => `<a class="sub" href="/${s.slug}">${s.navTitle}</a>`).join('\n      ')}
       <a href="/price-list">Price List</a>
       <a href="/contact-us">Contact</a>
     </nav>
-    <div class="drawer__foot">
-      ${locations.map((l) => `<a href="tel:${l.phoneHref}">${l.name}: ${l.phone}</a>`).join('')}
-      <a href="mailto:${site.email}">${site.email}</a>
-    </div>
-  </div>`;
+  </header>`;
 }
 
-function ctaBand() {
+function banner(title, crumb, bgImage) {
   return `
-  <section class="section section--tight cta">
-    <div class="container cta__in">
+  <section class="banner"${bgImage ? ` style="background-image:url('/img/${bgImage}.webp')"` : ''}>
+    <div class="container banner__in">
+      <h1>${title}</h1>
+      <nav class="crumbs" aria-label="Breadcrumb">
+        <a href="/">Home</a><span aria-hidden="true">&rsaquo;</span>${crumb}
+      </nav>
+    </div>
+  </section>`;
+}
+
+function ctaStrip() {
+  return `
+  <section class="cta-strip">
+    <div class="container cta-strip__in">
       <div>
-        <span class="eyebrow">Contact</span>
-        <h2 class="display h2">Come and see us</h2>
-        <p class="lede mt-1" style="max-width:52ch">Drop in at Canary Wharf or London Bridge, or send us a note and we will come back to you.</p>
+        <h2>Need something cleaned?</h2>
+        <p>Call Canary Wharf on ${locations[0].phone} or London Bridge on ${locations[1].phone}.</p>
       </div>
-      <div class="btn-row">
-        <a class="btn" href="/contact-us">Make an enquiry</a>
-        <a class="btn btn--ghost" href="/price-list">View prices</a>
+      <div class="btn-group">
+        <a class="btn btn--white" href="/contact-us">Request a quote</a>
+        <a class="btn btn--light" href="/price-list">View prices</a>
       </div>
     </div>
   </section>`;
@@ -150,20 +164,20 @@ function footer() {
   return `
   <footer class="footer">
     <div class="container">
-      <div class="footer__grid">
-        <div>
+      <div class="row">
+        <div class="col col-3">
           <img class="footer__logo" src="/img/logo-white.png" alt="${site.name}" width="1000" height="229" loading="lazy">
-          <p style="max-width:34ch">${site.description}</p>
+          <p>${site.description}</p>
         </div>
 
-        <div>
-          <h3>Services</h3>
+        <div class="col col-3">
+          <h3>Our Services</h3>
           <ul>
             ${services.map((s) => `<li><a href="/${s.slug}">${s.navTitle}</a></li>`).join('\n            ')}
           </ul>
         </div>
 
-        <div>
+        <div class="col col-3">
           <h3>Information</h3>
           <ul>
             <li><a href="/">Home</a></li>
@@ -171,28 +185,24 @@ function footer() {
             <li><a href="/contact-us">Contact Us</a></li>
             <li><a href="mailto:${site.email}">${site.email}</a></li>
           </ul>
+          <h3 style="margin-top:28px">Head Office</h3>
+          <address>${headOffice.company}, ${headOffice.lines.join(', ')}<br>
+            <a href="tel:${headOffice.phoneHref}">${headOffice.phone}</a></address>
         </div>
 
-        <div>
-          <h3>Find us</h3>
+        <div class="col col-3">
+          <h3>Our Shops</h3>
           ${locations
             .map(
-              (l) => `<address style="margin-bottom:1.4rem">
-            <strong style="color:#fff;font-weight:500">${l.name}</strong><br>
-            ${l.lines.join(', ')}<br>
-            <a class="footer__tel" href="tel:${l.phoneHref}">${l.phone}</a>
-          </address>`
+              (l) => `<address><strong>${l.name}</strong><br>${l.lines.join(', ')}<br>
+            <a href="tel:${l.phoneHref}">${l.phone}</a></address>`
             )
             .join('\n          ')}
-          <h3 style="margin-top:2rem">${headOffice.name}</h3>
-          <address>
-            ${headOffice.company}, ${headOffice.lines.join(', ')}<br>
-            <a href="tel:${headOffice.phoneHref}">${headOffice.phone}</a>
-          </address>
         </div>
       </div>
-
-      <div class="footer__bar">
+    </div>
+    <div class="footer__bar">
+      <div class="container">
         <span>&copy; ${year} ${site.name}. All rights reserved.</span>
         <span>Established ${site.founded} &middot; Canary Wharf &middot; London Bridge</span>
       </div>
@@ -233,20 +243,14 @@ function jsonLd(path) {
     })),
   ];
   if (path === '/') {
-    graph.push({
-      '@type': 'WebSite',
-      '@id': site.domain + '/#website',
-      url: site.domain,
-      name: site.name,
-      publisher: { '@id': site.domain + '/#org' },
-    });
+    graph.push({ '@type': 'WebSite', '@id': site.domain + '/#website', url: site.domain, name: site.name, publisher: { '@id': site.domain + '/#org' } });
   }
   return JSON.stringify({ '@context': 'https://schema.org', '@graph': graph });
 }
 
 /* ---------------- document ---------------- */
 
-function layout({ title, description, path, body, bodyClass = '' }) {
+function layout({ title, description, path, body }) {
   const canonical = site.domain + (path === '/' ? '' : path);
   return `<!doctype html>
 <html lang="en-GB">
@@ -256,7 +260,7 @@ function layout({ title, description, path, body, bodyClass = '' }) {
 <title>${title}</title>
 <meta name="description" content="${description}">
 <link rel="canonical" href="${canonical}">
-<meta name="theme-color" content="#0F2038">
+<meta name="theme-color" content="#1665A8">
 
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="${site.name}">
@@ -271,12 +275,12 @@ function layout({ title, description, path, body, bodyClass = '' }) {
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Jost:wght@300;400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700&family=Open+Sans:ital,wght@0,400;0,600;0,700;1,400&display=swap">
 <link rel="stylesheet" href="/css/site.css">
 
 <script type="application/ld+json">${jsonLd(path)}</script>
 </head>
-<body class="${bodyClass}">
+<body>
 <a class="skip" href="#main">Skip to content</a>
 ${header(path === '/' ? 'home' : path.replace(/^\//, ''))}
 <main id="main">
@@ -290,7 +294,7 @@ ${footer()}
 }
 
 module.exports = {
-  layout, header, footer, ctaBand,
-  serviceCard, locationCard, priceTable, priceRow, money,
+  layout, header, footer, banner, ctaStrip,
+  serviceCard, priceTable, locationInfo, mapEmbed, money, ic, featIcons,
   site, headOffice, locations, services, priceGroups, credentials, steps, corporate,
 };
