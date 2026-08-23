@@ -15,25 +15,27 @@ const STATIC = path.join(__dirname, 'static');
 
 function homePage() {
   const body = `
-  <section class="hero">
+  <section class="hero hero--photo">
     <div class="hero__bg" aria-hidden="true"></div>
     <div class="container hero__in">
-      <span class="eyebrow eyebrow--light">Established ${site.founded} &middot; Canary Wharf &amp; London Bridge</span>
-      <h1 class="display h1">Dry cleaning for the<br><em>City of London</em></h1>
-      <p class="hero__lede">${site.description}</p>
+      <span class="eyebrow eyebrow--light">Canary Wharf &amp; London Bridge</span>
+      <h1 class="display h1">Dry Cleaning in the<br>City of London</h1>
+      <p class="hero__lede">The highest quality shirt, dry cleaning and laundry service in Canary Wharf.</p>
       <div class="btn-row">
         <a class="btn btn--gold" href="#services">Our services</a>
         <a class="btn btn--light" href="/price-list">View price list</a>
       </div>
+    </div>
+  </section>
 
-      <div class="creds">
-        <ul class="creds__grid">
-          ${credentials.map((c) => `<li>
-            <span class="creds__fig">${c.figure}</span>
-            <span class="creds__lab">${c.label}</span>
-          </li>`).join('\n          ')}
-        </ul>
-      </div>
+  <section class="facts">
+    <div class="container">
+      <ul class="facts__grid">
+        ${credentials.map((c, i) => `<li class="reveal" data-delay="${i * 70}">
+          <h2 class="facts__t">${c.figure}</h2>
+          <p class="facts__x">${c.label}</p>
+        </li>`).join('\n        ')}
+      </ul>
     </div>
   </section>
 
@@ -56,10 +58,10 @@ function homePage() {
   <section class="section section--cream" id="services">
     <div class="container">
       <div class="center reveal" style="max-width:640px;margin-inline:auto">
-        <span class="eyebrow">Our services</span>
-        <h2 class="display h2">Seven services, one standard</h2>
+        <span class="eyebrow">What we do</span>
+        <h2 class="display h2">Services</h2>
         <hr class="rule rule--center">
-        <p>From a business shirt to a wedding dress, every piece is inspected by hand and cleaned by the method the cloth actually needs.</p>
+        <p>Everything we clean, from a business shirt to a wedding dress, curtains to a leather jacket.</p>
       </div>
       <div class="svc-grid mt-3">
 ${services.map(serviceCard).join('')}
@@ -89,7 +91,7 @@ ${services.map(serviceCard).join('')}
     <div class="container">
       <div class="center reveal" style="max-width:600px;margin-inline:auto">
         <span class="eyebrow">The process</span>
-        <h2 class="display h2">How a garment moves through the shop</h2>
+        <h2 class="display h2">How we work</h2>
         <hr class="rule rule--center">
       </div>
       <ul class="steps mt-3">
@@ -106,7 +108,7 @@ ${services.map(serviceCard).join('')}
     <div class="container split">
       <div class="reveal">
         <span class="eyebrow">Price list</span>
-        <h2 class="display h2">Published in full, nothing hidden</h2>
+        <h2 class="display h2">Price list</h2>
         <hr class="rule">
         <p>Every price we charge is on the site. Alterations are quoted at the counter once the tailor has seen the piece.</p>
         <div class="mt-2"><a class="btn" href="/price-list">See the full price list</a></div>
@@ -157,7 +159,7 @@ function servicePage(svc) {
 
   const body = `
   <section class="hero hero--page">
-    <div class="hero__bg" aria-hidden="true"></div>
+    <div class="hero__bg" aria-hidden="true" style="background-image:url('/img/${svc.image}.webp')"></div>
     <div class="container hero__in">
       <nav class="crumbs" aria-label="Breadcrumb">
         <a href="/">Home</a><span aria-hidden="true">/</span>${svc.title}

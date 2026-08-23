@@ -251,9 +251,9 @@ ul { margin: 0; padding: 0; list-style: none; }
 }
 .hero__bg {
   position: absolute; inset: 0; z-index: -2;
-  background-image: url('/img/hero-texture.webp');
+  background-image: url('/img/hero.webp');
   background-size: cover; background-position: center;
-  opacity: .17;
+  opacity: .22;
 }
 .hero::after {
   content: ''; position: absolute; inset: 0; z-index: -1;
@@ -488,3 +488,38 @@ ul { margin: 0; padding: 0; list-style: none; }
   .topbar__in { flex-wrap: wrap; justify-content: center; padding-block: .5rem; }
   .topbar__set { gap: 1.2rem; }
 }
+
+/* ---------- photographic hero ---------- */
+.hero--photo { padding-block: clamp(6rem, 15vw, 12.5rem); }
+.hero--photo .hero__bg { background-image: url('/img/hero.webp'); opacity: 1; }
+.hero--photo::after {
+  background:
+    linear-gradient(90deg,
+      rgba(10,23,41,.96) 0%,
+      rgba(10,23,41,.93) 42%,
+      rgba(10,23,41,.74) 62%,
+      rgba(10,23,41,.42) 100%),
+    linear-gradient(180deg, rgba(10,23,41,.30) 0%, rgba(10,23,41,.10) 45%, rgba(10,23,41,.45) 100%);
+}
+.hero--photo .hero__in { max-width: 740px; }
+.hero--photo .h1 { font-size: clamp(2.5rem, 5.1vw, 4.15rem); }
+@media (max-width: 900px) {
+  .hero--photo::after {
+    background: linear-gradient(180deg, rgba(10,23,41,.9) 0%, rgba(10,23,41,.86) 55%, rgba(10,23,41,.94) 100%);
+  }
+}
+
+/* service page heroes: their own photo, held well back */
+.hero--page .hero__bg { opacity: .22; }
+
+/* ---------- facts bar ---------- */
+.facts { background: var(--cream); border-bottom: 1px solid var(--line); padding-block: clamp(2.6rem, 5vw, 4rem); }
+.facts__grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: clamp(1.6rem, 3vw, 3rem); }
+.facts__grid > li { padding-left: 1.4rem; border-left: 1px solid var(--line); }
+.facts__t {
+  font-family: var(--sans); font-size: .72rem; font-weight: 500;
+  letter-spacing: .2em; text-transform: uppercase; color: var(--gold); margin-bottom: .7rem;
+}
+.facts__x { font-size: .93rem; line-height: 1.65; color: var(--body); }
+@media (max-width: 900px) { .facts__grid { grid-template-columns: repeat(2, 1fr); gap: 1.6rem 2rem; } }
+@media (max-width: 520px) { .facts__grid { grid-template-columns: 1fr; } }

@@ -266,10 +266,22 @@ const priceGroups = [
 
 /* Grounded in the client's own copy. No invented claims. */
 const credentials = [
-  { figure: '1994', label: 'Established' },
-  { figure: 'Two', label: 'City counters' },
-  { figure: 'Three', label: 'Solvent systems' },
-  { figure: 'On site', label: 'Tailor & seamstress' },
+  {
+    figure: 'Established 1994',
+    label: 'Collecting, processing and delivering for Canary Wharf since 1994.',
+  },
+  {
+    figure: 'Two City counters',
+    label: 'Canary Wharf and London Bridge, both open to walk-ins.',
+  },
+  {
+    figure: 'Tailor on site',
+    label: 'A tailor and seamstress at Canary Wharf for repairs and alterations.',
+  },
+  {
+    figure: 'Three solvent systems',
+    label: 'Perchloroethylene, hydrocarbon and aqueous, chosen for the cloth.',
+  },
 ];
 
 const process = [
@@ -296,8 +308,8 @@ const process = [
 ];
 
 const corporate = {
-  eyebrow: 'Corporate & executive',
-  title: 'You have got to be seen to be pristine',
+  eyebrow: 'Corporate',
+  title: 'Corporate Cleaning &amp; Executive Services Available',
   body: [
     'For establishments in the public eye such as restaurants, hotels, health clubs, beauty salons, delivery services and retail, you have got to be seen to be pristine.',
     'But even out of public view in offices, the reception and the boardroom give out instant signals about how you value your business, and subsequently your clients’ business.',

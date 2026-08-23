@@ -134,8 +134,8 @@ function ctaBand() {
   <section class="section section--tight cta">
     <div class="container cta__in">
       <div>
-        <span class="eyebrow">Ready when you are</span>
-        <h2 class="display h2">Bring us something difficult</h2>
+        <span class="eyebrow">Contact</span>
+        <h2 class="display h2">Come and see us</h2>
         <p class="lede mt-1" style="max-width:52ch">Drop in at Canary Wharf or London Bridge, or send us a note and we will come back to you.</p>
       </div>
       <div class="btn-row">
