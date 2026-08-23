@@ -2,6 +2,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const crypto = require('crypto');
 const T = require('./src/templates');
 const {
   layout, banner, ctaStrip, serviceCard, priceTable, locationInfo, mapEmbed, ic, featIcons,
@@ -481,26 +482,73 @@ ${banner('Contact Us', 'Contact Us', 'shirt-service')}
 
 /* --------------------------------------------------------------- build */
 
-function copyDir(from, to) {
-  fs.mkdirSync(to, { recursive: true });
-  for (const entry of fs.readdirSync(from, { withFileTypes: true })) {
-    const src = path.join(from, entry.name);
-    const dst = path.join(to, entry.name);
-    if (entry.isDirectory()) copyDir(src, dst);
-    else fs.copyFileSync(src, dst);
-  }
+/**
+ * Content-hashed asset pipeline.
+ *
+ * Every css/js/img file is emitted as name.<hash>.ext and every reference to it
+ * is rewritten. This is what makes the long immutable Cache-Control header in
+ * vercel.json safe: the URL changes whenever the bytes change, so a returning
+ * visitor can never be served a stale stylesheet against fresh markup.
+ */
+function shortHash(buf) {
+  return crypto.createHash('md5').update(buf).digest('hex').slice(0, 8);
 }
 
+function applyManifest(str, manifest) {
+  // longest keys first so /img/logo-navy.png is not clipped by a shorter key
+  const keys = Object.keys(manifest).sort((a, b) => b.length - a.length);
+  for (const k of keys) str = str.split(k).join(manifest[k]);
+  return str;
+}
+
+function emitHashed(dir, file, contents, manifest) {
+  const ext = path.extname(file);
+  const base = path.basename(file, ext);
+  const name = base + '.' + shortHash(contents) + ext;
+  fs.mkdirSync(path.join(OUT, dir), { recursive: true });
+  fs.writeFileSync(path.join(OUT, dir, name), contents);
+  manifest['/' + dir + '/' + file] = '/' + dir + '/' + name;
+  return name;
+}
+
+function buildAssets() {
+  const manifest = {};
+
+  // 1. images first, because the stylesheet references them
+  const imgDir = path.join(STATIC, 'img');
+  for (const f of fs.readdirSync(imgDir)) {
+    emitHashed('img', f, fs.readFileSync(path.join(imgDir, f)), manifest);
+  }
+
+  // 2. stylesheet, with its image references rewritten before hashing
+  const css = applyManifest(fs.readFileSync(path.join(STATIC, 'css', 'site.css'), 'utf8'), manifest);
+  emitHashed('css', 'site.css', css, manifest);
+
+  // 3. script
+  emitHashed('js', 'site.js', fs.readFileSync(path.join(STATIC, 'js', 'site.js')), manifest);
+
+  // 4. anything else at the static root (favicon) stays at a stable URL
+  for (const e of fs.readdirSync(STATIC, { withFileTypes: true })) {
+    if (e.isDirectory()) continue;
+    fs.copyFileSync(path.join(STATIC, e.name), path.join(OUT, e.name));
+  }
+
+  return manifest;
+}
+
+let MANIFEST = {};
+
 function write(rel, html) {
+  const out = applyManifest(html, MANIFEST);
   const file = path.join(OUT, rel);
   fs.mkdirSync(path.dirname(file), { recursive: true });
-  fs.writeFileSync(file, html);
-  return rel + '  (' + Math.round(html.length / 1024) + ' kB)';
+  fs.writeFileSync(file, out);
+  return rel + '  (' + Math.round(out.length / 1024) + ' kB)';
 }
 
 function run() {
   fs.rmSync(OUT, { recursive: true, force: true });
-  copyDir(STATIC, OUT);
+  MANIFEST = buildAssets();
 
   const written = [];
   written.push(write('index.html', homePage()));
@@ -517,8 +565,25 @@ function run() {
   written.push(write('sitemap.xml', sitemap));
   written.push(write('robots.txt', `User-agent: *\nAllow: /\n\nSitemap: ${site.domain}/sitemap.xml\n`));
 
-  console.log('Built ' + written.length + ' files into dist/');
+  /* Guard: a stale-cache bug shipped once already. Fail the build if any
+     asset reference escapes the content hash. */
+  const unhashed = [];
+  for (const f of fs.readdirSync(OUT)) {
+    if (!f.endsWith('.html')) continue;
+    const html = fs.readFileSync(path.join(OUT, f), 'utf8');
+    for (const ref of html.match(/\/(?:css|js|img)\/[A-Za-z0-9._-]+/g) || []) {
+      if (!/\.[0-9a-f]{8}\.(css|js|webp|png|jpg|svg)$/.test(ref)) unhashed.push(f + ' -> ' + ref);
+    }
+  }
+  if (unhashed.length) {
+    console.error('Unhashed asset references found:');
+    unhashed.forEach((u) => console.error('  ' + u));
+    throw new Error(unhashed.length + ' unhashed asset reference(s); immutable caching would serve stale files.');
+  }
+
+  console.log('Built ' + written.length + ' pages into dist/');
   written.forEach((w) => console.log('  ' + w));
+  console.log('Hashed assets: ' + Object.keys(MANIFEST).length);
 }
 
 run();
