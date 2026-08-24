@@ -25,6 +25,11 @@ const baseUrl = (
   'https://www.cityoflondondrycleaners.co.uk'
 ).replace(/\/+$/, '');
 
+/* True only once the site is served from the client's own domain. Until then
+   this is a preview, and search engines are asked to keep out so the demo can
+   never compete with the client's live site for their own search terms. */
+const isLiveDomain = /(^|\.)cityoflondondrycleaners\.co\.uk$/.test(new URL(baseUrl).hostname);
+
 const site = {
   name: 'City of London Dry Cleaners',
   shortName: 'City of London Dry Cleaners',
@@ -32,6 +37,7 @@ const site = {
   tagline: 'Dry cleaning, shirts and laundry for the City since 1994',
   domain: baseUrl,
   email: 'info@cityoflondondrycleaners.co.uk',
+  isLiveDomain,
   description:
     'City of London Dry Cleaners was founded in 1994 to collect, process and deliver high quality dry cleaning, shirt service and laundry in Canary Wharf.',
 };

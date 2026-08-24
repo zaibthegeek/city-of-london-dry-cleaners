@@ -691,7 +691,9 @@ function run() {
     urls.map((u) => `  <url><loc>${site.domain}${u === '/' ? '' : u}/</loc><lastmod>${today}</lastmod><priority>${u === '/' ? '1.0' : '0.8'}</priority></url>`).join('\n') +
     `\n</urlset>\n`;
   written.push(write('sitemap.xml', sitemap));
-  written.push(write('robots.txt', `User-agent: *\nAllow: /\n\nSitemap: ${site.domain}/sitemap.xml\n`));
+  written.push(write('robots.txt', site.isLiveDomain
+    ? `User-agent: *\nAllow: /\n\nSitemap: ${site.domain}/sitemap.xml\n`
+    : `# Preview deployment. Kept out of search so it cannot compete with the\n# client's live site. Set SITE_URL to the real domain to allow indexing.\nUser-agent: *\nDisallow: /\n`));
 
   /* Guard: a stale-cache bug shipped once already. Fail the build if any
      asset reference escapes the content hash. */

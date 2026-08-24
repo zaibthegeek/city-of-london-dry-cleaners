@@ -342,7 +342,7 @@ function layout({ title, description, path, body, pageName }) {
 <title>${title}</title>
 <meta name="description" content="${description}">
 <link rel="canonical" href="${canonical}">
-<meta name="theme-color" content="#1665A8">
+<meta name="theme-color" content="#1665A8">${site.isLiveDomain ? '' : '\n<meta name="robots" content="noindex, nofollow">'}
 
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="${site.name}">

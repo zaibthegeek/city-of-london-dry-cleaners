@@ -81,6 +81,12 @@ So preview deployments stay self-consistent and share cards resolve. **When the
 real domain points here, set `SITE_URL=https://www.cityoflondondrycleaners.co.uk`
 in the Vercel project settings** and every absolute URL follows.
 
+Until the base URL is the client's own domain, every page carries
+`<meta name="robots" content="noindex, nofollow">` and `robots.txt` disallows
+everything, so a preview can never be indexed and compete with the client's
+live site for their own search terms. Setting `SITE_URL` to the real domain
+removes both automatically.
+
 ## Asset caching
 
 Every css, js and image file is emitted as `name.<hash>.ext` and all references
