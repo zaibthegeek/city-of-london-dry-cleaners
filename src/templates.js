@@ -15,6 +15,7 @@ const ic = {
   drop: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.7s6 6.7 6 10.4a6 6 0 11-12 0C6 9.4 12 2.7 12 2.7z"/></svg>',
   hanger: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8V7a2.5 2.5 0 112.5 2.5"/><path d="M12 8l9.2 6.4a1.6 1.6 0 01-.9 2.9H3.7a1.6 1.6 0 01-.9-2.9L12 8z"/></svg>',
   chevL: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>',
+  heart: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 21s-7.6-4.9-9.8-9.2A5.6 5.6 0 0112 5.1a5.6 5.6 0 019.8 6.7C19.6 16.1 12 21 12 21z"/></svg>',
   search: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.6-3.6"/></svg>',
   chevUp: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 15l-6-6-6 6"/></svg>',
   chevR: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>',
@@ -211,6 +212,7 @@ function footer() {
       <div class="container">
         <span>&copy; ${year} ${site.name}. All rights reserved.</span>
         <span>Established ${site.founded} &middot; Canary Wharf &middot; London Bridge</span>
+        <span class="footer__credit">Designed with <span class="heart">${ic.heart}</span><span class="sr-only">love</span> by <a href="https://fixology.co.uk" target="_blank" rel="noopener">Fixology</a></span>
       </div>
     </div>
   </footer>`;

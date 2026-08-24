@@ -481,3 +481,12 @@ body.menu-open .callbar { transform: translateY(105%); opacity: 0; }
 @media (max-width: 991px) { [id] { scroll-margin-top: 86px; } }
 html { scroll-behavior: smooth; }
 @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+
+/* ---------- designer credit ---------- */
+.footer__credit { display: inline-flex; align-items: center; gap: 5px; white-space: nowrap; }
+.footer__credit .heart { display: inline-flex; }
+.footer__credit .heart svg { width: 13px; height: 13px; color: #E2564D; transition: transform .25s ease; }
+.footer__credit:hover .heart svg { transform: scale(1.18); }
+.footer__credit a { color: rgba(255,255,255,.82); font-weight: 600; }
+.footer__credit a:hover { color: var(--cyan); }
+@media (prefers-reduced-motion: reduce) { .footer__credit .heart svg { transition: none; } }
