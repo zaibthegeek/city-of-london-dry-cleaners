@@ -22,42 +22,81 @@
     });
   }
 
-  /* ---------------- sticky call bar ----------------
-     Visible only between the hero and the footer, so it never competes with
-     the hero buttons and never sits on top of the footer's own numbers. */
-  var callbar = document.getElementById('callbar');
-  if (callbar) {
-    var hero = document.querySelector('.slider') || document.querySelector('.banner');
-    var foot = document.querySelector('.footer');
-    var pastHero = !hero;
-    var atFooter = false;
+  /* ---------------- back to top ---------------- */
+  var totop = document.getElementById('totop');
+  if (totop) {
+    var toggleTop = function () {
+      totop.classList.toggle('is-on', window.scrollY > 600);
+    };
+    toggleTop();
+    window.addEventListener('scroll', toggleTop, { passive: true });
+    totop.addEventListener('click', function () {
+      window.scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' });
+    });
+  }
 
-    var sync = function () {
-      callbar.classList.toggle('is-visible', pastHero && !atFooter);
+  /* ---------------- price list filter ----------------
+     Enhancement only: the control is hidden in the markup and revealed here,
+     so a visitor without JS still gets the complete, unfiltered price list. */
+  var pf = document.getElementById('pfilter');
+  if (pf) {
+    var input = document.getElementById('pfilter-input');
+    var clear = document.getElementById('pfilter-clear');
+    var count = document.getElementById('pfilter-count');
+    var wraps = [].slice.call(document.querySelectorAll('.table-wrap'));
+    var rows = [].slice.call(document.querySelectorAll('.ptable tbody tr'));
+    var total = rows.length;
+
+    var empty = document.createElement('p');
+    empty.className = 'pfilter-empty';
+    empty.hidden = true;
+    empty.textContent = 'Nothing matches that search. Try a shorter word, or call either shop and we will quote it for you.';
+    if (wraps.length) wraps[0].parentNode.insertBefore(empty, wraps[0]);
+
+    pf.hidden = false;
+
+    var run = function () {
+      var q = (input.value || '').trim().toLowerCase();
+      clear.hidden = !q;
+
+      if (!q) {
+        rows.forEach(function (r) { r.hidden = false; });
+        wraps.forEach(function (w) { w.hidden = false; });
+        empty.hidden = true;
+        count.textContent = '';
+        return;
+      }
+
+      var shown = 0;
+      rows.forEach(function (r) {
+        var cell = r.cells[0];
+        var hit = cell && cell.textContent.toLowerCase().indexOf(q) !== -1;
+        r.hidden = !hit;
+        if (hit) shown++;
+      });
+
+      // hide any table left with no visible rows
+      wraps.forEach(function (w) {
+        var any = [].slice.call(w.querySelectorAll('tbody tr')).some(function (r) { return !r.hidden; });
+        w.hidden = !any;
+      });
+
+      empty.hidden = shown !== 0;
+      count.textContent = shown
+        ? 'Showing ' + shown + ' of ' + total + ' items'
+        : 'No items match "' + input.value.trim() + '"';
     };
 
-    if ('IntersectionObserver' in window) {
-      if (hero) {
-        new IntersectionObserver(function (entries) {
-          pastHero = !entries[0].isIntersecting;
-          sync();
-        }, { threshold: 0 }).observe(hero);
-      }
-      if (foot) {
-        new IntersectionObserver(function (entries) {
-          atFooter = entries[0].isIntersecting;
-          sync();
-        }, { threshold: 0 }).observe(foot);
-      }
-    } else {
-      window.addEventListener('scroll', function () {
-        pastHero = window.scrollY > (hero ? hero.offsetHeight : 400);
-        var d = document.documentElement;
-        atFooter = window.innerHeight + window.scrollY >= d.scrollHeight - (foot ? foot.offsetHeight : 0);
-        sync();
-      }, { passive: true });
-    }
-    sync();
+    input.addEventListener('input', run);
+    input.addEventListener('search', run);
+    clear.addEventListener('click', function () {
+      input.value = '';
+      run();
+      input.focus();
+    });
+    input.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && input.value) { input.value = ''; run(); }
+    });
   }
 
   /* ---------------- slider ---------------- */

@@ -5,9 +5,10 @@ const path = require('path');
 const crypto = require('crypto');
 const T = require('./src/templates');
 const {
-  layout, banner, ctaStrip, serviceCard, priceTable, locationInfo, mapEmbed, ic, featIcons,
+  layout, banner, ctaStrip, serviceCard, priceTable, locationInfo, mapEmbed, ic, featIcons, faqSection,
   site, headOffice, locations, services, priceGroups, credentials, steps, corporate,
 } = T;
+const { faqs } = require('./src/data');
 
 const OUT = path.join(__dirname, 'dist');
 const STATIC = path.join(__dirname, 'static');
@@ -148,7 +149,8 @@ ${services.map(serviceCard).join('')}${serviceCard({
           </div>
           ${corporate.body.map((p) => `<p style="color:rgba(255,255,255,.88)">${p}</p>`).join('\n          ')}
           <p style="color:#fff;font-weight:600;margin-top:18px">${corporate.sectors.join(' &middot; ')}</p>
-          <div class="btn-group mt-2"><a class="btn btn--white" href="/contact-us">Discuss a corporate account</a></div>
+          <div class="btn-group mt-2"><a class="btn btn--white" href="/corporate-accounts">Corporate accounts</a>
+            <a class="btn btn--light" href="/contact-us">Talk to us</a></div>
         </div>
       </div>
     </div>
@@ -171,6 +173,8 @@ ${services.map(serviceCard).join('')}${serviceCard({
       <div style="text-align:center"><a class="btn" href="/price-list">See the full price list</a></div>
     </div>
   </section>
+
+${faqSection()}
 
   <section class="section">
     <div class="container">
@@ -300,6 +304,7 @@ ${ctaStrip()}`;
     title: `${svc.title} | ${site.name}`,
     description: svc.lede,
     path: '/' + svc.slug,
+    pageName: svc.title,
     body,
   });
 }
@@ -319,6 +324,15 @@ ${banner('Price List', 'Price List', 'dry-cleaning')}
             <span class="bar"></span>
             <p>Every price we charge, in full. Bring anything unusual to the counter and we will quote it before we start.</p>
           </div>
+
+          <div class="pfilter" id="pfilter" hidden>
+            <label class="sr-only" for="pfilter-input">Search the price list</label>
+            <span class="pfilter__icon" aria-hidden="true">${ic.search}</span>
+            <input id="pfilter-input" type="search" placeholder="Search for an item, for example suit, shirt, duvet" autocomplete="off">
+            <button class="pfilter__clear" id="pfilter-clear" type="button" aria-label="Clear search" hidden>&times;</button>
+          </div>
+          <p class="pfilter__count" id="pfilter-count" role="status" aria-live="polite"></p>
+
           ${priceGroups.map(priceTable).join('\n          ')}
 
           <div class="alert">
@@ -339,6 +353,7 @@ ${ctaStrip()}`;
     description:
       'Full published price list for dry cleaning, shirt service, laundry, repairs and alterations at City of London Dry Cleaners, Canary Wharf and London Bridge.',
     path: '/price-list',
+    pageName: 'Price List',
     body,
   });
 }
@@ -476,6 +491,117 @@ ${banner('Contact Us', 'Contact Us', 'shirt-service')}
     description:
       'Contact City of London Dry Cleaners. Canary Wharf 020 7512 9215, London Bridge 020 7357 8800, or email info@cityoflondondrycleaners.co.uk.',
     path: '/contact-us',
+    pageName: 'Contact Us',
+    body,
+  });
+}
+
+/* -------------------------------------------------- corporate accounts */
+
+function corporatePage() {
+  const body = `
+${banner('Corporate Accounts', 'Corporate Accounts', 'shirt-service')}
+
+  <section class="section">
+    <div class="container">
+      <div class="row">
+        <div class="col col-8">
+          <div class="sec-head">
+            <h2>${corporate.title}</h2>
+            <span class="bar"></span>
+          </div>
+          ${corporate.body.map((p, i) => `<p${i === 0 ? ' class="lead"' : ''}>${p}</p>`).join('\n          ')}
+
+          <img src="/img/corporate-band.webp" alt="Business attire prepared for collection"
+               width="2000" height="700"
+               style="border:1px solid var(--line);border-radius:var(--radius);margin:28px 0">
+
+          <div class="sec-head" style="margin-top:8px">
+            <h2>Who We Look After</h2>
+            <span class="bar"></span>
+          </div>
+          <div class="row">
+            ${corporate.sectors
+              .map(
+                (sec) => `<div class="col col-4"><div class="sector">${ic.hanger}<span>${sec}</span></div></div>`
+              )
+              .join('\n            ')}
+          </div>
+
+          <div class="panel mt-2" style="margin-top:34px">
+            <div class="panel__head"><h3>What an account gives you</h3></div>
+            <div class="panel__body">
+              <ul class="checks">
+                <li>Dry cleaning, shirt service, laundry and alterations on one account</li>
+                <li>Collecting, processing and delivering, as we have done since 1994</li>
+                <li>Two counters in the City: Canary Wharf and London Bridge</li>
+                <li>A tailor and seamstress on site at Canary Wharf for repairs and alterations</li>
+                <li>Three solvent systems, chosen for the cloth: perchloroethylene, hydrocarbon and aqueous</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="btn-group mt-2">
+            <a class="btn" href="/contact-us">Discuss an account</a>
+            <a class="btn btn--outline" href="/price-list">View prices</a>
+          </div>
+        </div>
+${sidebar('corporate-accounts')}
+      </div>
+    </div>
+  </section>
+
+${ctaStrip()}`;
+
+  return layout({
+    title: `Corporate Accounts | ${site.name}`,
+    description:
+      'Corporate cleaning and executive services from City of London Dry Cleaners for restaurants, hotels, health clubs, beauty salons, retail and offices in Canary Wharf and London Bridge.',
+    path: '/corporate-accounts',
+    pageName: 'Corporate Accounts',
+    body,
+  });
+}
+
+/* ------------------------------------------------------------------ 404 */
+
+function notFoundPage() {
+  const body = `
+${banner('Page Not Found', 'Page Not Found', 'dry-cleaning')}
+
+  <section class="section">
+    <div class="container">
+      <div class="row">
+        <div class="col col-8">
+          <div class="sec-head">
+            <h2>We could not find that page</h2>
+            <span class="bar"></span>
+            <p>The page may have moved, or the address may have been mistyped. Everything we do is listed below, or call either shop and we will point you the right way.</p>
+          </div>
+          <div class="row">
+            ${services
+              .map(
+                (sv) => `<div class="col col-6"><div class="sector"><a href="/${sv.slug}">${ic.hanger}<span>${sv.title}</span></a></div></div>`
+              )
+              .join('\n            ')}
+          </div>
+          <div class="btn-group mt-2">
+            <a class="btn" href="/">Back to the home page</a>
+            <a class="btn btn--outline" href="/contact-us">Contact us</a>
+          </div>
+        </div>
+${sidebar('404')}
+      </div>
+    </div>
+  </section>
+
+${ctaStrip()}`;
+
+  return layout({
+    title: `Page Not Found | ${site.name}`,
+    description: 'The page you were looking for could not be found.',
+    path: '/404',
+    pageName: 'Page Not Found',
     body,
   });
 }
@@ -555,8 +681,10 @@ function run() {
   for (const svc of services) written.push(write(svc.slug + '.html', servicePage(svc)));
   written.push(write('price-list.html', pricePage()));
   written.push(write('contact-us.html', contactPage()));
+  written.push(write('corporate-accounts.html', corporatePage()));
+  written.push(write('404.html', notFoundPage()));
 
-  const urls = ['/', ...services.map((s) => '/' + s.slug), '/price-list', '/contact-us'];
+  const urls = ['/', ...services.map((s) => '/' + s.slug), '/price-list', '/corporate-accounts', '/contact-us'];
   const today = new Date().toISOString().slice(0, 10);
   const sitemap =
     `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n` +

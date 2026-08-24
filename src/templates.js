@@ -1,6 +1,6 @@
 'use strict';
 
-const { site, headOffice, locations, services, priceGroups, credentials, process: steps, corporate } = require('./data');
+const { site, headOffice, locations, services, priceGroups, credentials, process: steps, corporate, faqs } = require('./data');
 
 const year = new Date().getFullYear();
 const money = (n) => '£' + n.toFixed(2);
@@ -15,6 +15,8 @@ const ic = {
   drop: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.7s6 6.7 6 10.4a6 6 0 11-12 0C6 9.4 12 2.7 12 2.7z"/></svg>',
   hanger: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8V7a2.5 2.5 0 112.5 2.5"/><path d="M12 8l9.2 6.4a1.6 1.6 0 01-.9 2.9H3.7a1.6 1.6 0 01-.9-2.9L12 8z"/></svg>',
   chevL: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>',
+  search: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.6-3.6"/></svg>',
+  chevUp: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 15l-6-6-6 6"/></svg>',
   chevR: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>',
 };
 const featIcons = [ic.clock, ic.pin, ic.scissors, ic.drop];
@@ -127,6 +129,7 @@ function header(current) {
       <a href="/">Home</a>
       ${services.map((s) => `<a class="sub" href="/${s.slug}">${s.navTitle}</a>`).join('\n      ')}
       <a href="/price-list">Price List</a>
+      <a href="/corporate-accounts">Corporate Accounts</a>
       <a href="/contact-us">Contact</a>
       <a class="mnav__mail" href="mailto:${site.email}">${site.email}</a>
       <div class="mnav__cta"><a class="btn btn--block" href="/contact-us">Request a quote</a></div>
@@ -184,6 +187,7 @@ function footer() {
           <ul>
             <li><a href="/">Home</a></li>
             <li><a href="/price-list">Price List</a></li>
+            <li><a href="/corporate-accounts">Corporate Accounts</a></li>
             <li><a href="/contact-us">Contact Us</a></li>
             <li><a href="mailto:${site.email}">${site.email}</a></li>
           </ul>
@@ -212,6 +216,33 @@ function footer() {
   </footer>`;
 }
 
+function faqSection() {
+  return `
+  <section class="section section--grey" id="faq">
+    <div class="container">
+      <div class="sec-head sec-head--center">
+        <h2>Frequently Asked Questions</h2>
+        <span class="bar"></span>
+        <p>If your question is not answered here, call either shop and we will be happy to help.</p>
+      </div>
+      <div class="faq">
+        ${faqs
+          .map(
+            (f, i) => `<details class="faq__item"${i === 0 ? ' open' : ''}>
+          <summary class="faq__q">${f.q}</summary>
+          <div class="faq__a"><p>${f.a}</p></div>
+        </details>`
+          )
+          .join('\n        ')}
+      </div>
+    </div>
+  </section>`;
+}
+
+function backToTop() {
+  return `<button class="totop" id="totop" type="button" aria-label="Back to top">${ic.chevUp}</button>`;
+}
+
 function callBar() {
   return `
   <div class="callbar" id="callbar">
@@ -230,7 +261,7 @@ function callBar() {
 
 /* ---------------- structured data ---------------- */
 
-function jsonLd(path) {
+function jsonLd(path, pageName) {
   const graph = [
     {
       '@type': 'Organization',
@@ -262,13 +293,46 @@ function jsonLd(path) {
   ];
   if (path === '/') {
     graph.push({ '@type': 'WebSite', '@id': site.domain + '/#website', url: site.domain, name: site.name, publisher: { '@id': site.domain + '/#org' } });
+    graph.push({
+      '@type': 'FAQPage',
+      '@id': site.domain + '/#faq',
+      mainEntity: faqs.map((f) => ({
+        '@type': 'Question',
+        name: f.q,
+        acceptedAnswer: { '@type': 'Answer', text: f.a },
+      })),
+    });
+  } else {
+    graph.push({
+      '@type': 'BreadcrumbList',
+      '@id': site.domain + path + '/#breadcrumbs',
+      itemListElement: [
+        { '@type': 'ListItem', position: 1, name: 'Home', item: site.domain },
+        { '@type': 'ListItem', position: 2, name: pageName || '', item: site.domain + path },
+      ],
+    });
   }
+
+  /* each cleaning service, so search engines can read the offer list */
+  const svc = services.find((x) => '/' + x.slug === path);
+  if (svc) {
+    graph.push({
+      '@type': 'Service',
+      '@id': site.domain + path + '/#service',
+      name: svc.title,
+      description: svc.lede,
+      serviceType: svc.title,
+      provider: { '@id': site.domain + '/#org' },
+      areaServed: 'London',
+    });
+  }
+
   return JSON.stringify({ '@context': 'https://schema.org', '@graph': graph });
 }
 
 /* ---------------- document ---------------- */
 
-function layout({ title, description, path, body }) {
+function layout({ title, description, path, body, pageName }) {
   const canonical = site.domain + (path === '/' ? '' : path);
   return `<!doctype html>
 <html lang="en-GB">
@@ -287,6 +351,11 @@ function layout({ title, description, path, body }) {
 <meta property="og:url" content="${canonical}">
 <meta property="og:locale" content="en_GB">
 <meta name="twitter:card" content="summary_large_image">
+<meta property="og:image" content="${site.domain}/img/og-card.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="${site.name}, Canary Wharf and London Bridge">
+<meta name="twitter:image" content="${site.domain}/img/og-card.jpg">
 
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="/img/logo-navy.png">
@@ -296,7 +365,7 @@ function layout({ title, description, path, body }) {
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700&family=Open+Sans:ital,wght@0,400;0,600;0,700;1,400&display=swap">
 <link rel="stylesheet" href="/css/site.css">
 
-<script type="application/ld+json">${jsonLd(path)}</script>
+<script type="application/ld+json">${jsonLd(path, pageName)}</script>
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
@@ -305,6 +374,7 @@ ${header(path === '/' ? 'home' : path.replace(/^\//, ''))}
 ${body}
 </main>
 ${footer()}
+${backToTop()}
 ${callBar()}
 <script src="/js/site.js" defer></script>
 </body>
@@ -313,7 +383,7 @@ ${callBar()}
 }
 
 module.exports = {
-  layout, header, footer, banner, ctaStrip, callBar,
+  layout, header, footer, banner, ctaStrip, callBar, faqSection, backToTop,
   serviceCard, priceTable, locationInfo, mapEmbed, money, ic, featIcons,
   site, headOffice, locations, services, priceGroups, credentials, steps, corporate,
 };

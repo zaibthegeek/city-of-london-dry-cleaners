@@ -342,25 +342,25 @@ h1 { font-size: 34px; } h2 { font-size: 26px; } h3 { font-size: 19px; } h4 { fon
 /* ============================================================
    Sticky call bar (small screens)
 
-   Stays out of the way while the hero call-to-actions are on screen,
-   rises once the user scrolls past them, and retires again at the footer
-   where both numbers are already listed. Shown only by JS, so if the
-   script never runs it can never cover content.
+   Present from first paint and fixed to the foot of the viewport, so both
+   shops are always one tap away. Pure CSS, so it survives a JS failure.
+   The page reserves matching bottom padding, so it never hides content.
    ============================================================ */
 .callbar {
   position: fixed; left: 0; right: 0; bottom: 0; z-index: 90;
   display: none;
-  background: rgba(27, 39, 50, .96);
+  background: rgba(27, 39, 50, .97);
   -webkit-backdrop-filter: saturate(170%) blur(12px);
   backdrop-filter: saturate(170%) blur(12px);
   box-shadow: 0 -8px 28px rgba(15, 23, 32, .30);
   padding-bottom: env(safe-area-inset-bottom, 0px);
-  transform: translateY(105%);
-  opacity: 0;
-  visibility: hidden;
-  transition: transform .42s cubic-bezier(.22,.61,.36,1), opacity .28s ease, visibility .42s;
+  transition: transform .32s cubic-bezier(.22,.61,.36,1), opacity .24s ease;
 }
-@media (max-width: 991px) { .callbar { display: block; } }
+@media (max-width: 991px) {
+  .callbar { display: block; }
+  /* reserve the bar's height so the footer is never sitting underneath it */
+  body { padding-bottom: calc(62px + env(safe-area-inset-bottom, 0px)); }
+}
 
 /* hairline of brand colour along the top edge */
 .callbar::before {
@@ -368,8 +368,8 @@ h1 { font-size: 34px; } h2 { font-size: 26px; } h3 { font-size: 19px; } h4 { fon
   background: linear-gradient(90deg, var(--blue) 0%, var(--cyan) 50%, var(--blue) 100%);
 }
 
-.callbar.is-visible { transform: none; opacity: 1; visibility: visible; }
-body.menu-open .callbar { transform: translateY(105%); opacity: 0; visibility: hidden; }
+/* steps aside only while the mobile menu is open */
+body.menu-open .callbar { transform: translateY(105%); opacity: 0; }
 
 .callbar__grid { display: flex; }
 .callbar__item {
@@ -406,4 +406,78 @@ body.menu-open .callbar { transform: translateY(105%); opacity: 0; visibility: h
   .callbar__icon { width: 32px; height: 32px; }
   .callbar__txt strong { font-size: 10.5px; letter-spacing: .05em; }
 }
-@media (prefers-reduced-motion: reduce) { .callbar { transition: opacity .01ms, visibility .01ms; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .callbar { transition: none; } }
+
+/* ---------- FAQ accordion (native details, works without JS) ---------- */
+.faq { max-width: 860px; margin-inline: auto; }
+.faq__item { background: #fff; border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); margin-bottom: 12px; overflow: hidden; }
+.faq__q {
+  list-style: none; cursor: pointer; position: relative;
+  padding: 17px 54px 17px 20px;
+  font-family: var(--head-font); font-size: 14.5px; font-weight: 600; color: var(--head);
+  transition: background .2s ease, color .2s ease;
+}
+.faq__q::-webkit-details-marker { display: none; }
+.faq__q:hover { background: var(--grey); color: var(--blue); }
+.faq__q::after {
+  content: ''; position: absolute; right: 22px; top: 50%; width: 9px; height: 9px;
+  border-right: 2px solid var(--blue); border-bottom: 2px solid var(--blue);
+  transform: translateY(-70%) rotate(45deg); transition: transform .25s ease;
+}
+.faq__item[open] .faq__q { background: var(--blue); color: #fff; }
+.faq__item[open] .faq__q::after { border-color: #fff; transform: translateY(-25%) rotate(-135deg); }
+.faq__a { padding: 18px 20px 20px; border-top: 1px solid var(--line); font-size: 14.5px; }
+.faq__item[open] .faq__a { animation: faqIn .28s ease; }
+@keyframes faqIn { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: none; } }
+
+/* ---------- price list filter ---------- */
+.pfilter { position: relative; margin-bottom: 10px; }
+.pfilter__icon { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: var(--blue); display: flex; }
+.pfilter__icon svg { width: 17px; height: 17px; }
+.pfilter input {
+  width: 100%; padding: 13px 44px 13px 44px; font-family: var(--body-font); font-size: 14.5px;
+  color: var(--head); background: #fff; border: 1px solid var(--line); border-radius: var(--radius);
+  box-shadow: var(--shadow); transition: border-color .2s, box-shadow .2s;
+}
+.pfilter input:focus { outline: none; border-color: var(--blue); box-shadow: 0 0 0 3px rgba(22,101,168,.12); }
+.pfilter input::-webkit-search-cancel-button { display: none; }
+.pfilter__clear {
+  position: absolute; right: 8px; top: 50%; transform: translateY(-50%);
+  width: 30px; height: 30px; border: 0; background: none; color: var(--text);
+  font-size: 22px; line-height: 1; cursor: pointer; border-radius: 50%;
+}
+.pfilter__clear:hover { background: var(--grey); color: var(--head); }
+.pfilter__count { font-size: 13px; color: var(--text); margin: 0 0 20px; min-height: 20px; }
+.ptable tr[hidden] { display: none; }
+.table-wrap[hidden] { display: none; }
+.pfilter-empty { border: 1px dashed var(--line); border-radius: var(--radius); padding: 30px 20px; text-align: center; color: var(--text); background: var(--grey); }
+
+/* ---------- sector chips ---------- */
+.sector { display: flex; align-items: center; gap: 10px; padding: 13px 15px; border: 1px solid var(--line); border-radius: var(--radius); background: #fff; margin-bottom: 12px; font-size: 14px; color: var(--head); transition: border-color .2s, box-shadow .2s; }
+.sector:hover { border-color: var(--blue); box-shadow: var(--shadow); }
+.sector svg { width: 19px; height: 19px; stroke: var(--blue); flex: none; }
+.sector a { display: flex; align-items: center; gap: 10px; color: var(--head); }
+.sector a:hover { color: var(--blue); }
+
+/* ---------- back to top ---------- */
+.totop {
+  position: fixed; right: 18px; bottom: 18px; z-index: 88;
+  width: 46px; height: 46px; padding: 0; border: 0; border-radius: var(--radius);
+  background: var(--slate); color: #fff; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 4px 16px rgba(27,39,50,.32);
+  opacity: 0; visibility: hidden; transform: translateY(10px);
+  transition: opacity .28s ease, transform .28s ease, visibility .28s, background .2s ease;
+}
+.totop.is-on { opacity: 1; visibility: visible; transform: none; }
+.totop:hover { background: var(--blue); }
+.totop svg { width: 19px; height: 19px; }
+/* clear the call bar on small screens */
+@media (max-width: 991px) { .totop { bottom: calc(74px + env(safe-area-inset-bottom, 0px)); width: 42px; height: 42px; } }
+@media (prefers-reduced-motion: reduce) { .totop { transition: opacity .01ms, visibility .01ms; transform: none; } }
+
+/* in-page anchors must clear the sticky header */
+[id] { scroll-margin-top: 104px; }
+@media (max-width: 991px) { [id] { scroll-margin-top: 86px; } }
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }

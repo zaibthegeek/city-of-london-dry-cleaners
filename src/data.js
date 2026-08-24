@@ -6,12 +6,31 @@
  * from the client's existing site at cityoflondondrycleaners.co.uk.
  */
 
+/**
+ * Absolute base URL used for canonical tags, Open Graph and the sitemap.
+ *
+ * Resolution order:
+ *   SITE_URL                        set this once the real domain points here
+ *   VERCEL_PROJECT_PRODUCTION_URL   the project's production domain
+ *   VERCEL_URL                      the individual deployment
+ *   the client's own domain         local builds
+ *
+ * This keeps preview deployments self-consistent, so share cards and canonical
+ * tags resolve against the host actually serving the page.
+ */
+const baseUrl = (
+  process.env.SITE_URL ||
+  (process.env.VERCEL_PROJECT_PRODUCTION_URL && 'https://' + process.env.VERCEL_PROJECT_PRODUCTION_URL) ||
+  (process.env.VERCEL_URL && 'https://' + process.env.VERCEL_URL) ||
+  'https://www.cityoflondondrycleaners.co.uk'
+).replace(/\/+$/, '');
+
 const site = {
   name: 'City of London Dry Cleaners',
   shortName: 'City of London Dry Cleaners',
   founded: 1994,
   tagline: 'Dry cleaning, shirts and laundry for the City since 1994',
-  domain: 'https://www.cityoflondondrycleaners.co.uk',
+  domain: baseUrl,
   email: 'info@cityoflondondrycleaners.co.uk',
   description:
     'City of London Dry Cleaners was founded in 1994 to collect, process and deliver high quality dry cleaning, shirt service and laundry in Canary Wharf.',
@@ -284,7 +303,8 @@ const credentials = [
   },
 ];
 
-const process = [
+/* renamed from `process` so it cannot shadow Node's global of that name */
+const careSteps = [
   {
     n: '01',
     title: 'Bring it in',
@@ -317,4 +337,46 @@ const corporate = {
   sectors: ['Restaurants', 'Hotels', 'Health clubs', 'Beauty salons', 'Delivery services', 'Retail', 'Offices'],
 };
 
-module.exports = { site, headOffice, locations, services, priceGroups, credentials, process, corporate };
+/* Every answer below is taken from the client's own published copy.
+   Nothing is asserted that their site does not already state. Opening hours
+   and turnaround times are deliberately absent, as they publish neither. */
+const faqs = [
+  {
+    q: 'Where are your shops?',
+    a: 'We have two counters in the City. Canary Wharf is at Jubilee Link, Canada Place, London E14 5AH on 020 7512 9215. London Bridge is at Western Arcade, London SE1 9GP on 020 7357 8800.',
+  },
+  {
+    q: 'What can you clean?',
+    a: 'The usual dry cleaning items such as suits, dresses and trousers, plus household items such as curtains and upholstery. We also have a specialist section for designer wear and wedding dresses, and a separate shirt and laundry service.',
+  },
+  {
+    q: 'Which cleaning solvents do you use?',
+    a: 'Our facilities allow us to clean in perchloroethylene, hydrocarbon and aqueous. The method is chosen to suit the garment and the cloth in front of us.',
+  },
+  {
+    q: 'Do you clean wedding dresses?',
+    a: 'Yes. We offer a specialist wedding dress cleaning service, and our dedicated staff take special care and attention while cleaning your dress. Designer suits and gowns are handled by the same specialist section.',
+  },
+  {
+    q: 'Do you carry out alterations and repairs?',
+    a: 'Yes. We have a tailor and seamstress on site at our Canary Wharf shop. That covers shortening and lengthening jackets, sleeves, trousers, skirts and dresses, adjusting waist size, replacing zips, invisible mending and moving buttons.',
+  },
+  {
+    q: 'How does your shirt service work?',
+    a: 'Cuffs and collars are pre-treated, and stains are spotted and treated before cleaning. We offer starch light, medium or heavy, or no starch at all. Every shirt is hand finished, hung or folded as you prefer, and returned packaged and protected.',
+  },
+  {
+    q: 'Can you clean suede and leather?',
+    a: 'Yes. Suede and leather are handled by technicians who take careful measures to retain the original state of the garment, treating it to restore colour, suppleness, oils and nap to as near the original condition as possible.',
+  },
+  {
+    q: 'Do you offer accounts for businesses?',
+    a: 'Yes. We provide corporate cleaning and executive services for restaurants, hotels, health clubs, beauty salons, delivery services, retail and offices. Please contact either shop to discuss an account.',
+  },
+  {
+    q: 'How much does it cost?',
+    a: 'Our full price list is published on the site. As a guide, a two piece suit starts at £23.49, a shirt is £3.99, and a dress starts at £16.99. Prices marked "from" vary with the garment, the cloth and the finish required.',
+  },
+];
+
+module.exports = { site, headOffice, locations, services, priceGroups, credentials, process: careSteps, corporate, faqs };

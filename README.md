@@ -51,7 +51,9 @@ Prices are stored as `[name, amount, isFrom]`. Set `isFrom` to `true` to render 
 
 `/` `/dry-cleaning` `/shirt-service` `/laundry` `/curtains-upholstery`
 `/suede-leather-cleaning` `/specialist-cleaning` `/tailoring-repairs-alterations`
-`/price-list` `/contact-us`
+`/price-list` `/corporate-accounts` `/contact-us`
+
+Plus a styled `404.html`, which Vercel serves for unknown paths.
 
 The URL structure matches the previous WordPress site exactly, so existing inbound links and
 search rankings carry over without redirects.
@@ -66,6 +68,27 @@ This keeps the site fully static with nothing to host or maintain. To capture su
 server side instead, point the form at an endpoint (Formspree, or a Vercel serverless
 function) in `static/js/site.js`, replacing the `mailto:` handoff in the submit handler.
 
+## Going live on the real domain
+
+Canonical tags, Open Graph and the sitemap resolve their base URL in this order:
+
+1. `SITE_URL` environment variable
+2. `VERCEL_PROJECT_PRODUCTION_URL` (the project's production domain)
+3. `VERCEL_URL` (the individual deployment)
+4. `https://www.cityoflondondrycleaners.co.uk` for local builds
+
+So preview deployments stay self-consistent and share cards resolve. **When the
+real domain points here, set `SITE_URL=https://www.cityoflondondrycleaners.co.uk`
+in the Vercel project settings** and every absolute URL follows.
+
+## Asset caching
+
+Every css, js and image file is emitted as `name.<hash>.ext` and all references
+are rewritten, so the year-long immutable `Cache-Control` in `vercel.json` is
+safe: the URL changes whenever the bytes do. The build fails if any asset
+reference escapes the hash. Do not remove that guard, and do not add an
+unhashed asset path by hand.
+
 ## Front end notes
 
 - 1170px twelve-column grid, the layout convention this kind of brochure site is built on
@@ -75,12 +98,18 @@ function) in `static/js/site.js`, replacing the `mailto:` handoff in the submit 
   a quote panel and a link to the price list
 - Google Maps embedded for both branches, centred on the postcode
 - All icons are inline SVG; no icon font, no JS libraries, no jQuery
+- Sticky call bar on screens up to 991px, one tap to either shop, pure CSS
+- FAQ accordion built on native `<details>`, so it works without JS
+- Live search on the price list, progressively enhanced: the field is hidden in
+  the markup and revealed by script, so the full list is always available
+- Generated Open Graph card at `static/img/og-card.jpg` for link previews
 
 ## Accessibility and SEO
 
 - Skip link, single `h1` per page, labelled form controls, visible focus states
 - `prefers-reduced-motion` respected for all animation
-- Schema.org `Organization` plus a `DryCleaningOrLaundry` entry per branch
+- Schema.org `Organization`, a `DryCleaningOrLaundry` entry per branch, `FAQPage`
+  on the home page, and `BreadcrumbList` plus `Service` on inner pages
 - Canonical URLs, Open Graph tags, generated `sitemap.xml` and `robots.txt`
 
 ## Notes on content
